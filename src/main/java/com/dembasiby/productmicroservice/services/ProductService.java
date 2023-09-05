@@ -1,13 +1,17 @@
 package com.dembasiby.productmicroservice.services;
 
+import java.util.List;
+
 import com.dembasiby.productmicroservice.dtos.GenericProductDTO;
 
 public interface ProductService {
     GenericProductDTO getProductById(Long id);
 
-    GenericProductDTO createProduct(GenericProductDTO genericProductDTO);
+    GenericProductDTO createProduct(GenericProductDTO productDTO);
 
-    void updateProduct(GenericProductDTO genericProductDTO);
+    void updateProduct(Long id, GenericProductDTO productDTO);
 
-    void deleteProduct(GenericProductDTO genericProductDTO);
+    void deleteProduct(Long id);
+
+    List<GenericProductDTO> getAllProducts();
 }
