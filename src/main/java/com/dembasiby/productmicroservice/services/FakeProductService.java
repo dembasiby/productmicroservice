@@ -1,7 +1,9 @@
 package com.dembasiby.productmicroservice.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.dembasiby.productmicroservice.dtos.FakeProductStoreDTO;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -11,9 +13,9 @@ import com.dembasiby.productmicroservice.dtos.GenericProductDTO;
 
 @Service
 public class FakeProductService implements ProductService {
-    private RestTemplateBuilder restTemplateBuilder;
-    private String getProductUrl = "https://fakestoreapi.com/products/{id}";
-    private String createProductUrl = "https://fakestoreapi.com/products";
+    private final RestTemplateBuilder restTemplateBuilder;
+    private final String getSpecificProductUrl = "https://fakestoreapi.com/products/{id}";
+    private final String getProductUrl = "https://fakestoreapi.com/products";
 
     public FakeProductService(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplateBuilder = restTemplateBuilder;
@@ -22,22 +24,14 @@ public class FakeProductService implements ProductService {
     @Override
     public GenericProductDTO getProductById(Long id) {
         RestTemplate restTemplate = restTemplateBuilder.build();
-        ResponseEntity<GenericProductDTO> response = restTemplate.getForEntity(getProductUrl, GenericProductDTO.class,
+        ResponseEntity<FakeProductStoreDTO> response = restTemplate.getForEntity(getSpecificProductUrl, FakeProductStoreDTO.class,
                 id);
-        GenericProductDTO genericProduct = response.getBody();
+        FakeProductStoreDTO genericProduct = response.getBody();
 
         if (genericProduct == null)
             return null;
 
-        GenericProductDTO product = new GenericProductDTO();
-        product.setId(genericProduct.getId());
-        product.setTitle(genericProduct.getTitle());
-        product.setPrice(genericProduct.getPrice());
-        product.setDescription(genericProduct.getDescription());
-        product.setCategory(genericProduct.getCategory());
-        product.setImage(genericProduct.getImage());
-
-        return product;
+        return getProductDetails(genericProduct);
 
     }
 
@@ -45,7 +39,7 @@ public class FakeProductService implements ProductService {
     public GenericProductDTO createProduct(GenericProductDTO productDTO) {
         RestTemplate restTemplate = restTemplateBuilder.build();
         ResponseEntity<GenericProductDTO> response = restTemplate.postForEntity(
-                createProductUrl, productDTO, GenericProductDTO.class);
+                getProductUrl, productDTO, GenericProductDTO.class);
 
         return response.getBody();
     }
@@ -54,22 +48,42 @@ public class FakeProductService implements ProductService {
     public void updateProduct(Long id, GenericProductDTO productDTO) {
         RestTemplate restTemplate = restTemplateBuilder.build();
         restTemplate.put(
-                getProductUrl, productDTO, id);
+                getSpecificProductUrl, productDTO, id);
     }
 
     @Override
     public void deleteProduct(Long id) {
         RestTemplate restTemplate = restTemplateBuilder.build();
-        restTemplate.delete(getProductUrl, id);
+        restTemplate.delete(getSpecificProductUrl, id);
     }
 
     @Override
     public List<GenericProductDTO> getAllProducts() {
         RestTemplate restTemplate = restTemplateBuilder.build();
-        ResponseEntity<List> response = restTemplate.getForEntity(
-                "https://fakestoreapi.com/products", List.class);
-        List<GenericProductDTO> genericProducts = response.getBody();
+        ResponseEntity<FakeProductStoreDTO[]> response = restTemplate.getForEntity(
+                getProductUrl, FakeProductStoreDTO[].class);
+        FakeProductStoreDTO[] fakeProducts = response.getBody();
+
+        if (fakeProducts == null) return null;
+
+        List<GenericProductDTO> genericProducts = new ArrayList<>();
+        for (FakeProductStoreDTO product : fakeProducts) {
+            genericProducts.add(getProductDetails((product)));
+        }
         return genericProducts;
+    }
+
+    private GenericProductDTO getProductDetails(FakeProductStoreDTO fakeProduct) {
+        GenericProductDTO product = new GenericProductDTO();
+
+        product.setId(fakeProduct.getId());
+        product.setTitle(fakeProduct.getTitle());
+        product.setPrice(String.valueOf(fakeProduct.getPrice()));
+        product.setDescription(fakeProduct.getDescription());
+        product.setCategory(fakeProduct.getCategory());
+        product.setImage(fakeProduct.getImage());
+
+        return product;
     }
 
 }
