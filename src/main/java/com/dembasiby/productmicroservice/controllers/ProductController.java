@@ -2,6 +2,7 @@ package com.dembasiby.productmicroservice.controllers;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,13 +30,13 @@ public class ProductController {
     }
 
     @PutMapping("{id}")
-    public void updateProduct(@PathVariable("id") Long id, @RequestBody GenericProductDTO productDetails) {
-        this.productService.updateProduct(id, productDetails);
+    public GenericProductDTO updateProduct(@PathVariable("id") Long id, @RequestBody GenericProductDTO productDetails) {
+        return this.productService.updateProduct(id, productDetails);
     }
 
     @DeleteMapping("{id}")
-    public void deleteProduct(@PathVariable("id") Long id) {
-        this.productService.deleteProduct(id);
+    public GenericProductDTO deleteProduct(@PathVariable("id") Long id) {
+        return this.productService.deleteProduct(id);
     }
 
     @GetMapping("{id}")

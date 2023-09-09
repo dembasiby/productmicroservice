@@ -5,8 +5,12 @@ import java.util.List;
 
 import com.dembasiby.productmicroservice.dtos.FakeProductStoreDTO;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 
 import com.dembasiby.productmicroservice.dtos.GenericProductDTO;
@@ -45,16 +49,30 @@ public class FakeProductService implements ProductService {
     }
 
     @Override
-    public void updateProduct(Long id, GenericProductDTO productDTO) {
+    public GenericProductDTO updateProduct(Long id, GenericProductDTO productDTO) {
         RestTemplate restTemplate = restTemplateBuilder.build();
-        restTemplate.put(
-                getSpecificProductUrl, productDTO, id);
+
+        HttpEntity<GenericProductDTO> requestEntity = new HttpEntity<GenericProductDTO>(productDTO);
+        ResponseEntity<GenericProductDTO> responseEntity = restTemplate.exchange(
+                getSpecificProductUrl,
+                HttpMethod.PUT,
+                requestEntity,
+                GenericProductDTO.class,
+                id);
+
+        return responseEntity.getBody();
     }
 
     @Override
-    public void deleteProduct(Long id) {
+    public GenericProductDTO deleteProduct(Long id) {
         RestTemplate restTemplate = restTemplateBuilder.build();
-        restTemplate.delete(getSpecificProductUrl, id);
+
+        RequestCallback requestCallback = restTemplate.acceptHeaderRequestCallback(GenericProductDTO.class);
+        ResponseExtractor<ResponseEntity<GenericProductDTO>> responseExtractor = restTemplate.responseEntityExtractor(GenericProductDTO.class);
+        ResponseEntity<GenericProductDTO> response = restTemplate.execute(getSpecificProductUrl, HttpMethod.DELETE, requestCallback, responseExtractor, id);
+        if (response == null) return null;
+
+        return response.getBody();
     }
 
     @Override
