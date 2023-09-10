@@ -28,7 +28,9 @@ public class FakeProductService implements ProductService {
     @Override
     public GenericProductDTO getProductById(Long id) {
         RestTemplate restTemplate = restTemplateBuilder.build();
-        ResponseEntity<FakeProductStoreDTO> response = restTemplate.getForEntity(getSpecificProductUrl, FakeProductStoreDTO.class,
+        ResponseEntity<FakeProductStoreDTO> response = restTemplate.getForEntity(
+                getSpecificProductUrl,
+                FakeProductStoreDTO.class,
                 id);
         FakeProductStoreDTO genericProduct = response.getBody();
 
