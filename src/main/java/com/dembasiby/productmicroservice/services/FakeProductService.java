@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dembasiby.productmicroservice.dtos.FakeProductStoreDTO;
+import com.dembasiby.productmicroservice.exceptions.NotFoundException;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -26,7 +27,7 @@ public class FakeProductService implements ProductService {
     }
 
     @Override
-    public GenericProductDTO getProductById(Long id) {
+    public GenericProductDTO getProductById(Long id) throws NotFoundException {
         RestTemplate restTemplate = restTemplateBuilder.build();
         ResponseEntity<FakeProductStoreDTO> response = restTemplate.getForEntity(
                 getSpecificProductUrl,
@@ -35,7 +36,7 @@ public class FakeProductService implements ProductService {
         FakeProductStoreDTO genericProduct = response.getBody();
 
         if (genericProduct == null)
-            return null;
+            throw new NotFoundException("Product with id " + id  + " does not exist.");
 
         return getProductDetails(genericProduct);
 
@@ -54,7 +55,7 @@ public class FakeProductService implements ProductService {
     public GenericProductDTO updateProduct(Long id, GenericProductDTO productDTO) {
         RestTemplate restTemplate = restTemplateBuilder.build();
 
-        HttpEntity<GenericProductDTO> requestEntity = new HttpEntity<GenericProductDTO>(productDTO);
+        HttpEntity<GenericProductDTO> requestEntity = new HttpEntity<>(productDTO);
         ResponseEntity<GenericProductDTO> responseEntity = restTemplate.exchange(
                 getSpecificProductUrl,
                 HttpMethod.PUT,

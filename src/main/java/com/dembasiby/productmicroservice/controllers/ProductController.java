@@ -2,6 +2,7 @@ package com.dembasiby.productmicroservice.controllers;
 
 import java.util.List;
 
+import com.dembasiby.productmicroservice.exceptions.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +41,7 @@ public class ProductController {
     }
 
     @GetMapping("{id}")
-    public GenericProductDTO getProductById(@PathVariable("id") Long id) {
+    public GenericProductDTO getProductById(@PathVariable("id") Long id) throws NotFoundException {
         return this.productService.getProductById(id);
     }
 
