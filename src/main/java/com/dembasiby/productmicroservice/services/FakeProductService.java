@@ -2,6 +2,7 @@ package com.dembasiby.productmicroservice.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.dembasiby.productmicroservice.dtos.FakeProductStoreDTO;
 import com.dembasiby.productmicroservice.exceptions.NotFoundException;
@@ -27,18 +28,18 @@ public class FakeProductService implements ProductService {
     }
 
     @Override
-    public GenericProductDTO getProductById(Long id) throws NotFoundException {
+    public GenericProductDTO getProductById(String id) throws NotFoundException {
         RestTemplate restTemplate = restTemplateBuilder.build();
         ResponseEntity<FakeProductStoreDTO> response = restTemplate.getForEntity(
                 getSpecificProductUrl,
                 FakeProductStoreDTO.class,
-                id);
+                UUID.fromString(id));
         FakeProductStoreDTO genericProduct = response.getBody();
 
         if (genericProduct == null)
             throw new NotFoundException("Product with id " + id  + " does not exist.");
 
-        return getProductDetails(genericProduct);
+        return getProductDTODetails(genericProduct);
 
     }
 
@@ -52,7 +53,7 @@ public class FakeProductService implements ProductService {
     }
 
     @Override
-    public GenericProductDTO updateProduct(Long id, GenericProductDTO productDTO) {
+    public GenericProductDTO updateProduct(String id, GenericProductDTO productDTO) {
         RestTemplate restTemplate = restTemplateBuilder.build();
 
         HttpEntity<GenericProductDTO> requestEntity = new HttpEntity<>(productDTO);
@@ -61,13 +62,13 @@ public class FakeProductService implements ProductService {
                 HttpMethod.PUT,
                 requestEntity,
                 GenericProductDTO.class,
-                id);
+                UUID.fromString(id));
 
         return responseEntity.getBody();
     }
 
     @Override
-    public GenericProductDTO deleteProduct(Long id) {
+    public GenericProductDTO deleteProduct(String id) {
         RestTemplate restTemplate = restTemplateBuilder.build();
 
         RequestCallback requestCallback = restTemplate.acceptHeaderRequestCallback(GenericProductDTO.class);
@@ -89,22 +90,22 @@ public class FakeProductService implements ProductService {
 
         List<GenericProductDTO> genericProducts = new ArrayList<>();
         for (FakeProductStoreDTO product : fakeProducts) {
-            genericProducts.add(getProductDetails((product)));
+            genericProducts.add(getProductDTODetails((product)));
         }
         return genericProducts;
     }
 
-    private GenericProductDTO getProductDetails(FakeProductStoreDTO fakeProduct) {
-        GenericProductDTO product = new GenericProductDTO();
+    private GenericProductDTO getProductDTODetails(FakeProductStoreDTO fakeProduct) {
+        GenericProductDTO productDTO = new GenericProductDTO();
 
-        product.setId(fakeProduct.getId());
-        product.setTitle(fakeProduct.getTitle());
-        product.setPrice(String.valueOf(fakeProduct.getPrice()));
-        product.setDescription(fakeProduct.getDescription());
-        product.setCategory(fakeProduct.getCategory());
-        product.setImage(fakeProduct.getImage());
+        productDTO.setId(fakeProduct.getId());
+        productDTO.setTitle(fakeProduct.getTitle());
+        productDTO.setPrice(String.valueOf(fakeProduct.getPrice()));
+        productDTO.setDescription(fakeProduct.getDescription());
+        productDTO.setCategory(fakeProduct.getCategory());
+        productDTO.setImage(fakeProduct.getImage());
 
-        return product;
+        return productDTO;
     }
 
 }
