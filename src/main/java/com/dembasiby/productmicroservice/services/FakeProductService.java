@@ -95,10 +95,15 @@ public class FakeProductService implements ProductService {
         return genericProducts;
     }
 
+    @Override
+    public List<GenericProductDTO> getAllProductsIn(String categoryName) {
+        return null;
+    }
+
     private GenericProductDTO getProductDTODetails(FakeProductStoreDTO fakeProduct) {
         GenericProductDTO productDTO = new GenericProductDTO();
 
-        productDTO.setId(fakeProduct.getId());
+        productDTO.setId(fakeProduct.getId().toString());
         productDTO.setTitle(fakeProduct.getTitle());
         productDTO.setPrice(String.valueOf(fakeProduct.getPrice()));
         productDTO.setDescription(fakeProduct.getDescription());

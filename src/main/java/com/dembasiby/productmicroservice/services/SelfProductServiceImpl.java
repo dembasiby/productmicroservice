@@ -1,7 +1,9 @@
 package com.dembasiby.productmicroservice.services;
 
 import com.dembasiby.productmicroservice.dtos.GenericProductDTO;
+import com.dembasiby.productmicroservice.models.Category;
 import com.dembasiby.productmicroservice.models.Product;
+import com.dembasiby.productmicroservice.repositories.CategoryRepository;
 import com.dembasiby.productmicroservice.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +16,12 @@ import java.util.UUID;
 @Service("SelfProductServiceImpl")
 public class SelfProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
-    public SelfProductServiceImpl(ProductRepository productRepository) {
+    public SelfProductServiceImpl(ProductRepository productRepository,
+                                  CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -28,14 +33,25 @@ public class SelfProductServiceImpl implements ProductService {
     @Override
     public GenericProductDTO createProduct(GenericProductDTO productDTO) {
         Product product = new Product();
+        Optional<Category> optionalCategory = categoryRepository.findCategoryByName(productDTO.getCategory());
+        Category category;
+
+        if (optionalCategory.isEmpty()) {
+            category = new Category();
+            category.setName(productDTO.getCategory());
+            category.setUuid(UUID.randomUUID());
+            categoryRepository.save(category);
+        } else category = optionalCategory.get();
 
         product.setUuid(UUID.randomUUID());
         product.setTitle(productDTO.getTitle());
         product.setImage(productDTO.getImage());
         product.setDescription(productDTO.getDescription());
+        product.setCategory(category);
         product.setPrice(Double.parseDouble(productDTO.getPrice()));
 
         productRepository.save(product);
+        productDTO.setId(product.getUuid().toString());
 
         return productDTO;
     }
@@ -76,11 +92,24 @@ public class SelfProductServiceImpl implements ProductService {
         return genericProductDTOS;
     }
 
+    @Override
+    public List<GenericProductDTO> getAllProductsIn(String categoryName) {
+        List<Product> products = this.productRepository.getProductsByCategory_Name(categoryName);
+        List<GenericProductDTO> genericProductDTOS = new ArrayList<>();
+
+        for (Product product : products) {
+            genericProductDTOS.add(getProductDTODetailsFromProduct(product));
+        }
+        return genericProductDTOS;
+    }
+
     private GenericProductDTO getProductDTODetailsFromProduct(Product product) {
         GenericProductDTO productDTO = new GenericProductDTO();
 
+        productDTO.setId(product.getUuid().toString());
         productDTO.setTitle(product.getTitle());
         productDTO.setDescription(product.getDescription());
+        productDTO.setCategory(product.getCategory().getName());
         productDTO.setImage(product.getImage());
         productDTO.setPrice(String.valueOf(product.getPrice()));
 

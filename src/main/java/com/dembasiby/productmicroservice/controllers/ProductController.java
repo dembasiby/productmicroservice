@@ -3,6 +3,7 @@ package com.dembasiby.productmicroservice.controllers;
 import java.util.List;
 
 import com.dembasiby.productmicroservice.exceptions.NotFoundException;
+import com.dembasiby.productmicroservice.services.CategoryService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,9 +22,12 @@ import com.dembasiby.productmicroservice.services.ProductService;
 @RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
+    private final CategoryService categoryService;
 
-    public ProductController(@Qualifier("SelfProductServiceImpl") ProductService productService) {
+    public ProductController(@Qualifier("SelfProductServiceImpl") ProductService productService,
+                             CategoryService categoryService) {
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
     @PostMapping
@@ -49,5 +53,17 @@ public class ProductController {
     @GetMapping
     public List<GenericProductDTO> getAllProducts() {
         return this.productService.getAllProducts();
+    }
+
+    // Get all categories
+    @GetMapping("/categories")
+    public List<String> getAllCategoryNames() {
+        return this.categoryService.getAllCategoryNames();
+    }
+
+    // Get products in a specific category
+    @GetMapping("/category/{categoryName}")
+    public List<GenericProductDTO> getAllProductsIn(@PathVariable("categoryName") String categoryName) {
+        return this.productService.getAllProductsIn(categoryName);
     }
 }
