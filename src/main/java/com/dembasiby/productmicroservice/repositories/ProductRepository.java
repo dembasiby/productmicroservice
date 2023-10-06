@@ -11,6 +11,10 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     @Override
     Optional<Product> findById(UUID uuid);
 
+    Optional<Product> findProductByTitle(String title);
+    List<Product> findProductsByTitle(String title);
+
+
     @Override
     void deleteById(UUID uuid);
 

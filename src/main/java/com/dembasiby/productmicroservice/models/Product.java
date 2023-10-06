@@ -17,6 +17,7 @@ public class Product extends BaseModel {
    @JoinColumn(name = "category")
    private Category category;
 
+   // Replace the double price
    @OneToOne
    @JoinColumn(name = "price_id")
    private Price price;

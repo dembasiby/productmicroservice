@@ -5,6 +5,7 @@ import com.dembasiby.productmicroservice.models.Category;
 import com.dembasiby.productmicroservice.models.Price;
 import com.dembasiby.productmicroservice.models.Product;
 import com.dembasiby.productmicroservice.repositories.CategoryRepository;
+import com.dembasiby.productmicroservice.repositories.PriceRepository;
 import com.dembasiby.productmicroservice.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +19,14 @@ import java.util.UUID;
 public class SelfProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final PriceRepository priceRepository;
 
     public SelfProductServiceImpl(ProductRepository productRepository,
-                                  CategoryRepository categoryRepository) {
+                                  CategoryRepository categoryRepository,
+                                  PriceRepository priceRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.priceRepository = priceRepository;
     }
 
     @Override
@@ -44,7 +48,10 @@ public class SelfProductServiceImpl implements ProductService {
             categoryRepository.save(category);
         } else category = optionalCategory.get();
 
+        // TODO: Figure out how to deal with more than 1 object in the controller
         Price price = new Price(Double.parseDouble(productDTO.getPrice()), "");
+        price.setUuid(UUID.randomUUID());
+        priceRepository.save(price);
 
         product.setUuid(UUID.randomUUID());
         product.setTitle(productDTO.getTitle());
