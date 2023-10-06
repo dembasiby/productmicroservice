@@ -2,6 +2,7 @@ package com.dembasiby.productmicroservice.services;
 
 import com.dembasiby.productmicroservice.dtos.GenericProductDTO;
 import com.dembasiby.productmicroservice.models.Category;
+import com.dembasiby.productmicroservice.models.Price;
 import com.dembasiby.productmicroservice.models.Product;
 import com.dembasiby.productmicroservice.repositories.CategoryRepository;
 import com.dembasiby.productmicroservice.repositories.ProductRepository;
@@ -43,12 +44,14 @@ public class SelfProductServiceImpl implements ProductService {
             categoryRepository.save(category);
         } else category = optionalCategory.get();
 
+        Price price = new Price(Double.parseDouble(productDTO.getPrice()), "");
+
         product.setUuid(UUID.randomUUID());
         product.setTitle(productDTO.getTitle());
         product.setImage(productDTO.getImage());
         product.setDescription(productDTO.getDescription());
         product.setCategory(category);
-        product.setPrice(Double.parseDouble(productDTO.getPrice()));
+        product.setPrice(price);
 
         productRepository.save(product);
         productDTO.setId(product.getUuid().toString());
@@ -64,9 +67,15 @@ public class SelfProductServiceImpl implements ProductService {
         if (optionalProduct.isEmpty()) return null;
 
         Product product = optionalProduct.get();
+
+        Price price = product.getPrice();
+        if (price.getPrice() != Double.parseDouble(productDTO.getPrice())) {
+            price.setPrice(Double.parseDouble(productDTO.getPrice()));
+        }
+
         product.setTitle(productDTO.getTitle());
         product.setDescription(productDTO.getDescription());
-        product.setPrice(Double.parseDouble(productDTO.getPrice()));
+        product.setPrice(price);
         product.setImage(productDTO.getImage());
         productRepository.save(product);
 
@@ -111,7 +120,7 @@ public class SelfProductServiceImpl implements ProductService {
         productDTO.setDescription(product.getDescription());
         productDTO.setCategory(product.getCategory().getName());
         productDTO.setImage(product.getImage());
-        productDTO.setPrice(String.valueOf(product.getPrice()));
+        productDTO.setPrice(String.valueOf(product.getPrice().getPrice()));
 
         return productDTO;
     }

@@ -1,14 +1,10 @@
 package com.dembasiby.productmicroservice.models;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Data
+@Setter
+@Getter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,5 +17,8 @@ public class Product extends BaseModel {
    @JoinColumn(name = "category")
    private Category category;
 
-   private double price; 
+   @OneToOne
+   @JoinColumn(name = "price_id")
+   private Price price;
+
 }
