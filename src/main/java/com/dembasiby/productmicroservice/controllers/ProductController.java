@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dembasiby.productmicroservice.dtos.GenericProductDTO;
+import com.dembasiby.productmicroservice.dtos.ProductDTO;
 import com.dembasiby.productmicroservice.services.ProductService;
 
 
@@ -31,27 +31,27 @@ public class ProductController {
     }
 
     @PostMapping
-    public GenericProductDTO createProduct(@RequestBody GenericProductDTO productDTO) {
+    public ProductDTO createProduct(@RequestBody ProductDTO productDTO) {
         return this.productService.createProduct(productDTO);
     }
 
     @PutMapping("{id}")
-    public GenericProductDTO updateProduct(@PathVariable("id") String id, @RequestBody GenericProductDTO productDetails) {
+    public ProductDTO updateProduct(@PathVariable("id") String id, @RequestBody ProductDTO productDetails) {
         return this.productService.updateProduct(id, productDetails);
     }
 
     @DeleteMapping("{id}")
-    public GenericProductDTO deleteProduct(@PathVariable("id") String id) throws NotFoundException {
+    public ProductDTO deleteProduct(@PathVariable("id") String id) throws NotFoundException {
         return this.productService.deleteProduct(id);
     }
 
     @GetMapping("{id}")
-    public GenericProductDTO getProductById(@PathVariable("id") String id) throws NotFoundException {
+    public ProductDTO getProductById(@PathVariable("id") String id) throws NotFoundException {
         return this.productService.getProductById(id);
     }
 
     @GetMapping
-    public List<GenericProductDTO> getAllProducts() {
+    public List<ProductDTO> getAllProducts() {
         return this.productService.getAllProducts();
     }
 
@@ -63,7 +63,7 @@ public class ProductController {
 
     // Get products in a specific category
     @GetMapping("/category/{categoryName}")
-    public List<GenericProductDTO> getAllProductsIn(@PathVariable("categoryName") String categoryName) {
+    public List<ProductDTO> getAllProductsIn(@PathVariable("categoryName") String categoryName) {
         return this.productService.getAllProductsIn(categoryName);
     }
 }

@@ -1,6 +1,7 @@
 package com.dembasiby.productmicroservice.services;
 
-import com.dembasiby.productmicroservice.dtos.GenericProductDTO;
+import com.dembasiby.productmicroservice.dtos.ProductDTO;
+import com.dembasiby.productmicroservice.dtos.PriceDTO;
 import com.dembasiby.productmicroservice.models.Category;
 import com.dembasiby.productmicroservice.models.Price;
 import com.dembasiby.productmicroservice.models.Product;
@@ -30,13 +31,13 @@ public class SelfProductServiceImpl implements ProductService {
     }
 
     @Override
-    public GenericProductDTO getProductById(String id) {
+    public ProductDTO getProductById(String id) {
         Optional<Product> product = productRepository.findById(UUID.fromString(id));
         return product.map(this::getProductDTODetailsFromProduct).orElse(null);
     }
 
     @Override
-    public GenericProductDTO createProduct(GenericProductDTO productDTO) {
+    public ProductDTO createProduct(ProductDTO productDTO) {
         Product product = new Product();
         Optional<Category> optionalCategory = categoryRepository.findCategoryByName(productDTO.getCategory());
         Category category;
@@ -48,8 +49,8 @@ public class SelfProductServiceImpl implements ProductService {
             categoryRepository.save(category);
         } else category = optionalCategory.get();
 
-        // TODO: Figure out how to deal with more than 1 object in the controller
-        Price price = new Price(Double.parseDouble(productDTO.getPrice()), "");
+        Price price = new Price(productDTO.getPriceDTO().getPrice(),
+                productDTO.getPriceDTO().getCurrency());
         price.setUuid(UUID.randomUUID());
         priceRepository.save(price);
 
@@ -68,21 +69,17 @@ public class SelfProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public GenericProductDTO updateProduct(String id, GenericProductDTO productDTO) {
+    public ProductDTO updateProduct(String id, ProductDTO productDTO) {
         Optional<Product> optionalProduct = productRepository.findById(UUID.fromString(id));
 
         if (optionalProduct.isEmpty()) return null;
 
         Product product = optionalProduct.get();
 
-        Price price = product.getPrice();
-        if (price.getPrice() != Double.parseDouble(productDTO.getPrice())) {
-            price.setPrice(Double.parseDouble(productDTO.getPrice()));
-        }
-
+        product.getPrice().setPrice(productDTO.getPriceDTO().getPrice());
+        product.getPrice().setCurrency(productDTO.getPriceDTO().getCurrency());
         product.setTitle(productDTO.getTitle());
         product.setDescription(productDTO.getDescription());
-        product.setPrice(price);
         product.setImage(productDTO.getImage());
         productRepository.save(product);
 
@@ -91,16 +88,16 @@ public class SelfProductServiceImpl implements ProductService {
     }
 
     @Override
-    public GenericProductDTO deleteProduct(String id) {
-        GenericProductDTO toBeDeleted = this.getProductById(id);
+    public ProductDTO deleteProduct(String id) {
+        ProductDTO toBeDeleted = this.getProductById(id);
         productRepository.deleteById(UUID.fromString(id));
         return toBeDeleted;
     }
 
     @Override
-    public List<GenericProductDTO> getAllProducts() {
+    public List<ProductDTO> getAllProducts() {
         List<Product> products = productRepository.findAll();
-        List<GenericProductDTO> genericProductDTOS = new ArrayList<>();
+        List<ProductDTO> genericProductDTOS = new ArrayList<>();
 
         for (Product product : products)
             genericProductDTOS.add(getProductDTODetailsFromProduct(product));
@@ -109,9 +106,9 @@ public class SelfProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<GenericProductDTO> getAllProductsIn(String categoryName) {
+    public List<ProductDTO> getAllProductsIn(String categoryName) {
         List<Product> products = this.productRepository.getProductsByCategory_Name(categoryName);
-        List<GenericProductDTO> genericProductDTOS = new ArrayList<>();
+        List<ProductDTO> genericProductDTOS = new ArrayList<>();
 
         for (Product product : products) {
             genericProductDTOS.add(getProductDTODetailsFromProduct(product));
@@ -119,15 +116,19 @@ public class SelfProductServiceImpl implements ProductService {
         return genericProductDTOS;
     }
 
-    private GenericProductDTO getProductDTODetailsFromProduct(Product product) {
-        GenericProductDTO productDTO = new GenericProductDTO();
+    private ProductDTO getProductDTODetailsFromProduct(Product product) {
+        ProductDTO productDTO = new ProductDTO();
 
         productDTO.setId(product.getUuid().toString());
         productDTO.setTitle(product.getTitle());
         productDTO.setDescription(product.getDescription());
         productDTO.setCategory(product.getCategory().getName());
         productDTO.setImage(product.getImage());
-        productDTO.setPrice(String.valueOf(product.getPrice().getPrice()));
+        PriceDTO priceDTO = new PriceDTO();
+        priceDTO.setId(UUID.randomUUID().toString());
+        priceDTO.setPrice(product.getPrice().getPrice());
+        priceDTO.setCurrency(product.getPrice().getCurrency());
+        productDTO.setPriceDTO(priceDTO);
 
         return productDTO;
     }

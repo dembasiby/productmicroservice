@@ -2,19 +2,19 @@ package com.dembasiby.productmicroservice.services;
 
 import java.util.List;
 
-import com.dembasiby.productmicroservice.dtos.GenericProductDTO;
+import com.dembasiby.productmicroservice.dtos.ProductDTO;
 import com.dembasiby.productmicroservice.exceptions.NotFoundException;
 
 public interface ProductService {
-    GenericProductDTO getProductById(String id) throws NotFoundException;
+    ProductDTO getProductById(String id) throws NotFoundException;
 
-    GenericProductDTO createProduct(GenericProductDTO productDTO);
+    ProductDTO createProduct(ProductDTO productDTO);
 
-    GenericProductDTO updateProduct(String id, GenericProductDTO productDTO);
+    ProductDTO updateProduct(String id, ProductDTO productDTO);
 
-    GenericProductDTO deleteProduct(String id) throws NotFoundException;
+    ProductDTO deleteProduct(String id) throws NotFoundException;
 
-    List<GenericProductDTO> getAllProducts();
+    List<ProductDTO> getAllProducts();
 
-    List<GenericProductDTO> getAllProductsIn(String categoryName);
+    List<ProductDTO> getAllProductsIn(String categoryName);
 }

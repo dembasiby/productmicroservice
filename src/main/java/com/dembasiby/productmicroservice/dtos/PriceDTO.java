@@ -1,16 +1,17 @@
 package com.dembasiby.productmicroservice.dtos;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
-
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryDTO {
+public class PriceDTO {
     private String id;
-    private String name;
-    private List<ProductDTO> products;
+    private double price;
+    private String currency;
+
 }
